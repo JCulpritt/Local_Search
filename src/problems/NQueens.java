@@ -1,5 +1,6 @@
 package problems;
 
+import java.net.SocketOption;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -37,5 +38,32 @@ public class NQueens implements Problem<int[]>{
             }
         }
         return conflicts;
+    }
+
+    public double goalCost() {
+        return 0;
+    }
+
+    public int[] getInitState(){
+        Random r = new Random();
+        int[] state = new int[N];
+        for(int i = 0; i < N; i++) {
+            state[i] = r.nextInt(N);
+        }
+        return state;
+    }
+
+    public void printState(int[] state) {
+        for(int row = 0; row < N; row++) {
+            for(int col = 0; col < N; col++) {
+                if(state[col] == row){
+                    System.out.print("Q");
+                }
+                else{
+                    System.out.print("*");
+                }
+            }
+            System.out.print("\n");
+        }
     }
 }

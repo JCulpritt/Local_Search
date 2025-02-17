@@ -21,6 +21,9 @@ public abstract class SimulatedAnnealing<S> {
     public void search() {
         S currentState = problem.getInitState();
         while(temp > 0) {
+            if(problem.cost(currentState)==problem.goalCost()){
+                break;
+            }
             S newState = problem.generateNewState(currentState);
             double deltaE = problem.cost(currentState) - problem.cost(newState);
             if(accept(deltaE, temp)) {
@@ -30,6 +33,8 @@ public abstract class SimulatedAnnealing<S> {
             temp = schedule(time, temp);
 
         }
+        problem.printState(currentState);
+        System.out.println("The final cost is: " + problem.cost(currentState));
     }
 
     public boolean accept(double delta, double temp){
