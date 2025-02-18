@@ -45,7 +45,7 @@ public abstract class SimulatedAnnealing<S> {
             double probability = Math.exp(delta/temp);
             assert probability >= 0 && probability <= 1;
             Random r = new Random();
-            return(r.nextDouble()  < probability);
+            return(r.nextDouble() < probability);
         }
     }
 

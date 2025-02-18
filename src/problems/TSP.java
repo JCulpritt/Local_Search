@@ -4,10 +4,31 @@ import java.util.Random;
 import static java.lang.System.exit;
 
 public class TSP implements Problem<int[]>{
+    private final Sample MAP;
     private final int NumberOfCities;
 
-    public TSP(int n) {
-        NumberOfCities = n;
+    public TSP(int NumberOfCities) {
+        this.NumberOfCities = NumberOfCities;
+        switch (NumberOfCities) {
+            case 5:
+                this.MAP = Sample.SAMPLE_5;
+                break;
+            case 6:
+                this.MAP = Sample.SAMPLE_6;
+                break;
+            case 17:
+                this.MAP = Sample.SAMPLE_17;
+                break;
+            case 26:
+                this.MAP = Sample.SAMPLE_26;
+                break;
+            default:
+                this.MAP = null;
+                System.out.println("Wrong map size; Choose from: 5, 6, 17, or 26.");
+                exit(1);
+        }
+
+
     }
 
     public int[] generateNewState(int[] current) {
@@ -22,15 +43,14 @@ public class TSP implements Problem<int[]>{
 
     private int[] swap(int[] state, int i, int j) {
         int[] newState = state.clone();
-        newState[i] = newState[i] ^ newState[j];
-        newState[j] = newState[i] ^ newState[j];
-        newState[i] = newState[i] ^ newState[j];
-
+        int temp = newState[i];
+        newState[i] = newState[j];
+        newState[j] = temp;
         return newState;
     }
 
     public double cost(int[] state) {
-        int[][] costMatrix = Sample.SAMPLE_5.distanceMatrix;
+        int[][] costMatrix = MAP.distanceMatrix;
 
         double cost = 0;
 
@@ -51,25 +71,16 @@ public class TSP implements Problem<int[]>{
             state[i] = i;
         }
 
-        for (int i = NumberOfCities - 1; i > 0; i--) {
+        for (int i = NumberOfCities - 1; i >= 1; i--) {
             int j = r.nextInt(i + 1);
-            swap(state, i, j);
+            int temp = state[i];
+            state[i] = state[j];
+            state[j] = temp;
         }
 
-        int startCityIndex = r.nextInt(NumberOfCities);
-        int startCity = state[startCityIndex];
+        state[NumberOfCities] = state[0];
 
-        int[] newState = new int[NumberOfCities + 1];
-        int idx = 0;
-        for (int i = 0; i < NumberOfCities; i++) {
-            if (state[i] != startCity) {
-                newState[idx++] = state[i];
-            }
-        }
-
-        newState[NumberOfCities] = newState[0] = startCity;
-
-        return newState;
+        return state;
     }
 
 
@@ -82,7 +93,7 @@ public class TSP implements Problem<int[]>{
         for(int i : state) {
             System.out.printf("%d, ", i);
         }
-        System.out.printf("\nThis is the final path cost: %.1f\n", cost(state));
+        System.out.println();
     }
 
     public record Sample(int[][] distanceMatrix) {

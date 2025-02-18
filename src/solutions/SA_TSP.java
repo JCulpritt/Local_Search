@@ -3,6 +3,8 @@ package solutions;
 import core_algorithms.SimulatedAnnealing;
 import problems.TSP;
 
+import java.util.Scanner;
+
 public class SA_TSP extends SimulatedAnnealing<int[]> {
     private final static long INIT_TIME = 1;
     private final static double INIT_TEMP = 1e13;
@@ -17,7 +19,10 @@ public class SA_TSP extends SimulatedAnnealing<int[]> {
     }
 
     public static void main(String[] args) {
-        SA_TSP agent = new SA_TSP(new TSP(5));
+        System.out.println("Input the number of cities");
+        Scanner scanner = new Scanner(System.in);
+        int numberOfCites = scanner.nextInt();
+        SA_TSP agent = new SA_TSP(new TSP(numberOfCites));
         agent.search();
     }
 }
