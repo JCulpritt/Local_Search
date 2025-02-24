@@ -1,5 +1,7 @@
 package core_algorithms;
 
+import problems.TSP;
+
 import java.util.*;
 
 public abstract class GeneticAlgorithm<G> {
@@ -37,8 +39,34 @@ public abstract class GeneticAlgorithm<G> {
 
 
     //SECOND SELECTION IDEA
-    public Individual<G> select_Tournament(List<Individual<G>> population, Individual<G> individual){
-        return individual;
+    public Individual<G> select(List<Individual<G>> population, Individual<G> individual, double K){
+        Random random = new Random();
+        List<Integer> indexArrayList = new ArrayList<>();
+        int index;
+
+        List<Individual<G>> sampleList = new ArrayList<>();
+
+        for(int i = 0; i < (K * population.size()); i++) {
+            index = random.nextInt(population.size());
+            while(indexArrayList.contains(index)) {
+                index = random.nextInt(population.size());
+            }
+            indexArrayList.add(index);
+            sampleList.add(population.get(index));
+        }
+
+        Individual<G> selected = null;
+        int count = 0;
+        for(Individual<G> i : sampleList) {
+            if(count == 0) {
+                selected = i;
+                count++;
+            }
+            else if(i.getFitnessScore() > selected.getFitnessScore()){
+                selected = i;
+            }
+        }
+        return selected;
     }
 
     public abstract Individual<G> reproduce(Individual<G> p, Individual<G> q);
@@ -46,7 +74,7 @@ public abstract class GeneticAlgorithm<G> {
     public abstract Individual<G> mutate(Individual<G> individual);
 
     public abstract double calcFitnessScore(G chromosome);
-    public Individual<G> evolve (List<Individual<G>> initPopulation) {
+    public Individual<G> evolve (List<Individual<G>> initPopulation, double K) {
         List<Individual<G>> population = initPopulation;
         Collections.sort(population);
         int bestGen = 0;
@@ -55,8 +83,8 @@ public abstract class GeneticAlgorithm<G> {
         for(int generation = 1; generation <= MAX_GEN; generation++) {
             List<Individual<G>> offspring = new ArrayList<>();
             for(int i = 0; i < population.size(); i++) {
-                Individual<G> p = select(population, null);
-                Individual<G> q = select(population, p);
+                Individual<G> p = select(population, null, K);
+                Individual<G> q = select(population, p, K);
                 Individual<G> child = reproduce(p, q);
                 if(new Random().nextDouble() <= MUTATION) {
                     child = mutate(child);
