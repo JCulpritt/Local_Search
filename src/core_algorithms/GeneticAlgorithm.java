@@ -39,35 +39,30 @@ public abstract class GeneticAlgorithm<G> {
 
 
     //SECOND SELECTION IDEA
-    public Individual<G> select(List<Individual<G>> population, Individual<G> individual, double K){
+    public Individual<G> select(List<Individual<G>> population, Individual<G> individual, double K) {
         Random random = new Random();
-        List<Integer> indexArrayList = new ArrayList<>();
-        int index;
+        int sampleSize = (int) (K * population.size());
 
+        Set<Integer> indexSet = new HashSet<>();
         List<Individual<G>> sampleList = new ArrayList<>();
 
-        for(int i = 0; i < (K * population.size()); i++) {
-            index = random.nextInt(population.size());
-            while(indexArrayList.contains(index)) {
-                index = random.nextInt(population.size());
+        while (indexSet.size() < sampleSize) {
+            int index = random.nextInt(population.size());
+            if (indexSet.add(index)) {
+                sampleList.add(population.get(index));
             }
-            indexArrayList.add(index);
-            sampleList.add(population.get(index));
         }
 
-        Individual<G> selected = null;
-        int count = 0;
-        for(Individual<G> i : sampleList) {
-            if(count == 0) {
-                selected = i;
-                count++;
-            }
-            else if(i.getFitnessScore() > selected.getFitnessScore()){
-                selected = i;
+        sampleList.sort((a, b) -> Double.compare(b.getFitnessScore(), a.getFitnessScore()));
+
+        for (Individual<G> candidate : sampleList) {
+            if (!candidate.equals(individual)) {
+                return candidate;  // Return the first valid individual
             }
         }
-        return selected;
+        return sampleList.getFirst();
     }
+
 
     public abstract Individual<G> reproduce(Individual<G> p, Individual<G> q);
 
@@ -78,7 +73,7 @@ public abstract class GeneticAlgorithm<G> {
         List<Individual<G>> population = initPopulation;
         Collections.sort(population);
         int bestGen = 0;
-        Individual<G> best = population.get(0);
+        Individual<G> best = population.getFirst();
 
         for(int generation = 1; generation <= MAX_GEN; generation++) {
             List<Individual<G>> offspring = new ArrayList<>();
