@@ -78,8 +78,8 @@ public abstract class GeneticAlgorithm<G> {
         for(int generation = 1; generation <= MAX_GEN; generation++) {
             List<Individual<G>> offspring = new ArrayList<>();
             for(int i = 0; i < population.size(); i++) {
-                Individual<G> p = select(population, null, K);
-                Individual<G> q = select(population, p, K);
+                Individual<G> p = select(population, null);
+                Individual<G> q = select(population, p);
                 Individual<G> child = reproduce(p, q);
                 if(new Random().nextDouble() <= MUTATION) {
                     child = mutate(child);

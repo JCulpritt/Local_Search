@@ -61,12 +61,12 @@ public class TSP implements Problem<int[]>{
 
         }
 
-        return cost + costMatrix[state[state.length-1]][state[0]];
+        return cost;
     }
 
     public int[] getInitState() {
         Random r = new Random();
-        int[] state = new int[NumberOfCities];
+        int[] state = new int[NumberOfCities+1];
 
         for (int i = 0; i < NumberOfCities; i++) {
             state[i] = i;
@@ -78,6 +78,7 @@ public class TSP implements Problem<int[]>{
             state[i] = state[j];
             state[j] = temp;
         }
+        state[state.length-1] = state[0];
 
         return state;
     }
@@ -91,7 +92,6 @@ public class TSP implements Problem<int[]>{
         for(int i : state) {
             System.out.printf("%d, ", i);
         }
-        System.out.printf("%d", state[0]);
         System.out.println();
         System.out.println(getOptimalSolution(this.NumberOfCities));
     }
