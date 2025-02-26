@@ -72,11 +72,13 @@ public class GA_TSP extends GeneticAlgorithm<int[]> {
     }
 
     public static void main(String[] args) {
-        int MAX_GEN = 50;
-        double MUTATION_RATE = 0.3;
-        int POPULATION_SIZE = 1000;// 500: size of 5 and 6 //
-        double ELITISM = 0.3;
-        int SIZE = 5;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Input the number of cities: ");
+        int MAX_GEN = 500; //50: for 5 and 6  500+: for 17 and 26
+        double MUTATION_RATE = 0.05;
+        int POPULATION_SIZE = 5000;// 500: size of 5 and 6   5000+: for 17 and 26
+        double ELITISM = 0.1;
+        int SIZE = scanner.nextInt();
         double tournament_K = -1;
 
         TSP problem = new TSP(SIZE);
