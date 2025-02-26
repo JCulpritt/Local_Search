@@ -1,6 +1,6 @@
 package core_algorithms;
 
-import problems.TSP;
+import java.util.Random;
 
 import java.util.*;
 
@@ -47,7 +47,7 @@ public abstract class GeneticAlgorithm<G> {
 
         for (int i = 0; i < tournamentSize; i++) {
             Individual<G> candidate = population.get(r.nextInt(population.size()));
-            if (best == null || candidate.getFitnessScore() < best.getFitnessScore()) {
+            if (best == null || (candidate.getFitnessScore() < best.getFitnessScore() && candidate != individual)) {
                 best = candidate;
             }
         }
@@ -60,51 +60,48 @@ public abstract class GeneticAlgorithm<G> {
     public abstract Individual<G> mutate(Individual<G> individual);
 
     public abstract double calcFitnessScore(G chromosome);
-    public Individual<G> evolve (List<Individual<G>> initPopulation, double K) {
+    public Individual<G> evolve (List<Individual<G>> initPopulation, double K){
         List<Individual<G>> population = initPopulation;
-        Collections.sort(population);
+        population.sort(Comparator.comparingDouble(Individual::getFitnessScore));
         int bestGen = 0;
         Individual<G> best = population.getFirst();
-
-        for(int generation = 1; generation <= MAX_GEN; generation++) {
+        for (int generation = 1; generation <= MAX_GEN; generation++) {
             List<Individual<G>> offspring = new ArrayList<>();
-            for(int i = 0; i < population.size(); i++) {
+            for (int i=0; i<population.size(); i++) {
                 Individual<G> p;
                 Individual<G> q;
-                if(K > 0) {
-                    //Tournament Selection
+                if(K >= 1) {
                     p = select(population, null, K);
                     q = select(population, p, K);
                 }
                 else {
-                    //Roulette Selection
                     p = select(population, null);
                     q = select(population, p);
                 }
                 Individual<G> child = reproduce(p, q);
-                if(new Random().nextDouble() <= MUTATION) {
+                if (new Random().nextDouble() <= MUTATION) {
                     child = mutate(child);
                 }
                 offspring.add(child);
             }
-            Collections.sort(offspring);
+            population.sort(Comparator.comparingDouble(Individual::getFitnessScore));
             List<Individual<G>> newPopulation = new ArrayList<>();
             int e = (int) (ELITISM * population.size());
-            for(int i = 0; i < e; i++) {
+            for (int i=0; i<e; i++) {
                 newPopulation.add(population.get(i));
             }
-            for(int i = 0; i < population.size()-e; i++) {
+            for (int i=0; i<population.size()-e; i++) {
                 newPopulation.add(offspring.get(i));
             }
             population = newPopulation;
-            Collections.sort(population);
-            if(population.get(0).getFitnessScore() > best.getFitnessScore()) {
-                best = population.get(0);
+            population.sort(Comparator.comparingDouble(Individual::getFitnessScore));
+            //I changed this below statement because it was picking out the largest fitness score which is actually worse
+            if (population.getFirst().getFitnessScore() < best.getFitnessScore()){
+                best = population.getFirst();
                 bestGen = generation;
             }
         }
-
-        System.out.println("best gen: " + bestGen);
-        return population.get(0);
+        System.out.println("best gen: "+bestGen);
+        return population.getFirst();
     }
 }

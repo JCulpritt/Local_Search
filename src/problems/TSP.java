@@ -63,7 +63,7 @@ public class TSP implements Problem<int[]>{
 
         }
 
-        return cost;
+        return cost + costMatrix[state[0]][state[state.length-1]];
     }
 
     public int[] getInitState() {
@@ -93,6 +93,7 @@ public class TSP implements Problem<int[]>{
         for(int i : state) {
             System.out.printf("%d, ", i);
         }
+        System.out.printf("%d", state[0]);
         System.out.println();
         System.out.println(getOptimalSolution(this.NumberOfCities));
     }

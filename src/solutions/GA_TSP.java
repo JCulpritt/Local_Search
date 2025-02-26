@@ -72,12 +72,12 @@ public class GA_TSP extends GeneticAlgorithm<int[]> {
     }
 
     public static void main(String[] args) {
-        int MAX_GEN = 100;
-        double MUTATION_RATE = 0.2;
-        int POPULATION_SIZE = 500;
-        double ELITISM = 0.5;
+        int MAX_GEN = 50;
+        double MUTATION_RATE = 0.3;
+        int POPULATION_SIZE = 1000;// 500: size of 5 and 6 //
+        double ELITISM = 0.3;
         int SIZE = 5;
-        double tournament_K = 0.8;
+        double tournament_K = -1;
 
         TSP problem = new TSP(SIZE);
         GA_TSP agent =
