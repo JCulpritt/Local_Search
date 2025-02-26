@@ -4,10 +4,7 @@ import core_algorithms.GeneticAlgorithm;
 import core_algorithms.Individual;
 import problems.TSP;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class GA_TSP extends GeneticAlgorithm<int[]> {
     private final TSP problem;
@@ -28,13 +25,47 @@ public class GA_TSP extends GeneticAlgorithm<int[]> {
             endPos = t;
         }
 
-        int[] childChromosome = Arrays.copyOf(p.getChromosome(), p.getChromosome().length);
-        for(int i = 0; i < startPos; i++) {
-            childChromosome[i] = q.getChromosome()[i];
+        int[] childChromosome = new int[p.getChromosome().length];
+        Arrays.fill(childChromosome, -1);  // Assuming -1 means "empty" spot in the chromosome
+
+        // Copy the segment from p (between startPos and endPos) into the child
+        for (int i = startPos; i <= endPos; i++) {
+            childChromosome[i] = p.getChromosome()[i];
         }
-        for(int i = endPos + 1; i<q.getChromosome().length; i++) {
-            childChromosome[i] = q.getChromosome()[i];
+
+        // Use a set to track used genes in the child chromosome
+        Set<Integer> usedGenes = new HashSet<>();
+        for (int i = startPos; i <= endPos; i++) {
+            usedGenes.add(childChromosome[i]);
         }
+
+        // Fill in the remaining positions from q
+        int qIndex = 0;
+        for (int i = 0; i < childChromosome.length; i++) {
+            if (childChromosome[i] == -1) {
+                // Skip genes from q that are already in the child
+                int initialQIndex = qIndex;  // Remember initial qIndex to prevent infinite loop
+                while (usedGenes.contains(q.getChromosome()[qIndex])) {
+                    qIndex++;
+                    if (qIndex >= q.getChromosome().length) {
+                        qIndex = 0;  // Loop back if we reach the end of q
+                    }
+                    // If we've looped through all genes, break out of the while loop
+                    if (qIndex == initialQIndex) {
+                        System.out.println("No available genes left to place in the child.");
+                        break;
+                    }
+                }
+
+                // If we were able to find a valid gene, place it in the child
+                if (!usedGenes.contains(q.getChromosome()[qIndex])) {
+                    childChromosome[i] = q.getChromosome()[qIndex];
+                    usedGenes.add(childChromosome[i]);
+                }
+            }
+        }
+
+        // Return the new individual with the child chromosome and its fitness score
         return new Individual<>(childChromosome, calcFitnessScore(childChromosome));
     }
 
@@ -44,7 +75,7 @@ public class GA_TSP extends GeneticAlgorithm<int[]> {
     }
 
     public double calcFitnessScore(int[] chromosome){
-        return problem.getN()*(problem.getN() - 1) / (double)2 - problem.cost(chromosome);
+        return problem.cost(chromosome);
     }
 
     public List<Individual<int[]>> generateInitPopulation(int popSize){
@@ -58,19 +89,19 @@ public class GA_TSP extends GeneticAlgorithm<int[]> {
     }
 
     public static void main(String[] args) {
-        int MAX_GEN = 200;
-        double MUTATION_RATE = 0.1;
-        int POPULATION_SIZE = 5000;
-        double ELITISM = 0.4;
-        int SIZE = 32; //number of queens
+        int MAX_GEN = 800;
+        double MUTATION_RATE = 0.2;
+        int POPULATION_SIZE = 1000;
+        double ELITISM = 0.6;
+        int SIZE = 5; //number of queens
         double tournament_K = .2;
         TSP problem = new TSP(SIZE);
         GA_TSP agent =
                 new GA_TSP(MAX_GEN,MUTATION_RATE,ELITISM,problem);
         Individual<int[]> best =
                 agent.evolve(agent.generateInitPopulation(POPULATION_SIZE), tournament_K);
-        System.out.println("Best solution:");
-        problem.printState(best.getChromosome());
-        System.out.println("Best cost is: "+problem.cost(best.getChromosome()));
-    }
+
+        System.out.println("Best cost is: " + problem.cost(best.getChromosome()));
+        System.out.print("Best solution: ");
+        problem.printState(best.getChromosome());}
 }
