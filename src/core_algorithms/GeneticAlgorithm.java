@@ -20,14 +20,14 @@ public abstract class GeneticAlgorithm<G> {
     public Individual<G> select(List<Individual<G>> population, Individual<G> individual) {
         double sum = 0;
         for(Individual<G> i : population) {
-            sum += i.getFitnessScore();
+            sum += 1.0 / i.getFitnessScore();
         }
         Individual<G> selected = null;
         do {
             double v = new Random().nextDouble(sum);
             double cumulativeSum = 0;
             for(Individual<G> i : population) {
-                cumulativeSum += i.getFitnessScore();
+                cumulativeSum += 1.0 / i.getFitnessScore();
                 if(v <= cumulativeSum) {
                     selected = i;
                     break;
@@ -40,27 +40,18 @@ public abstract class GeneticAlgorithm<G> {
 
     //SECOND SELECTION IDEA
     public Individual<G> select(List<Individual<G>> population, Individual<G> individual, double K) {
-        Random random = new Random();
-        int sampleSize = (int) (K * population.size());
+        Random r = new Random();
+        int tournamentSize = (int) (K * population.size());
 
-        Set<Integer> indexSet = new HashSet<>();
-        List<Individual<G>> sampleList = new ArrayList<>();
+        Individual<G> best = null;
 
-        while (indexSet.size() < sampleSize) {
-            int index = random.nextInt(population.size());
-            if (indexSet.add(index)) {
-                sampleList.add(population.get(index));
+        for (int i = 0; i < tournamentSize; i++) {
+            Individual<G> candidate = population.get(r.nextInt(population.size()));
+            if (best == null || candidate.getFitnessScore() < best.getFitnessScore()) {
+                best = candidate;
             }
         }
-
-        sampleList.sort((a, b) -> Double.compare(b.getFitnessScore(), a.getFitnessScore()));
-
-        for (Individual<G> candidate : sampleList) {
-            if (!candidate.equals(individual)) {
-                return candidate;  // Return the first valid individual
-            }
-        }
-        return sampleList.getFirst();
+        return best;
     }
 
 
@@ -78,8 +69,18 @@ public abstract class GeneticAlgorithm<G> {
         for(int generation = 1; generation <= MAX_GEN; generation++) {
             List<Individual<G>> offspring = new ArrayList<>();
             for(int i = 0; i < population.size(); i++) {
-                Individual<G> p = select(population, null);
-                Individual<G> q = select(population, p);
+                Individual<G> p;
+                Individual<G> q;
+                if(K > 0) {
+                    //Tournament Selection
+                    p = select(population, null, K);
+                    q = select(population, p, K);
+                }
+                else {
+                    //Roulette Selection
+                    p = select(population, null);
+                    q = select(population, p);
+                }
                 Individual<G> child = reproduce(p, q);
                 if(new Random().nextDouble() <= MUTATION) {
                     child = mutate(child);

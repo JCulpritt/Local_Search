@@ -33,11 +33,13 @@ public class TSP implements Problem<int[]>{
 
     public int[] generateNewState(int[] current) {
         Random r = new Random();
-        int index1 = r.nextInt(1,NumberOfCities-1);
-        int index2 = r.nextInt(1,NumberOfCities-1);
+        int index1 = r.nextInt(NumberOfCities);
+        int index2 = r.nextInt(NumberOfCities);
+
         while (index1 == index2) {
-            index2 = r.nextInt(1, NumberOfCities-1);
+            index2 = r.nextInt(NumberOfCities);
         }
+
         return swap(current, index1, index2);
     }
 
@@ -66,7 +68,7 @@ public class TSP implements Problem<int[]>{
 
     public int[] getInitState() {
         Random r = new Random();
-        int[] state = new int[NumberOfCities+1];
+        int[] state = new int[NumberOfCities];
 
         for (int i = 0; i < NumberOfCities; i++) {
             state[i] = i;
@@ -78,7 +80,6 @@ public class TSP implements Problem<int[]>{
             state[i] = state[j];
             state[j] = temp;
         }
-        state[state.length-1] = state[0];
 
         return state;
     }

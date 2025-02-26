@@ -41,7 +41,6 @@ public class GA_TSP extends GeneticAlgorithm<int[]> {
         return new Individual<>(childChromosome, calcFitnessScore(childChromosome));
     }
 
-    // Helper method to check if a city exists in the chromosome
     private boolean contains(int[] array, int num) {
         for (int i : array) {
             if (i == num) {
@@ -74,7 +73,7 @@ public class GA_TSP extends GeneticAlgorithm<int[]> {
 
     public static void main(String[] args) {
         int MAX_GEN = 100;
-        double MUTATION_RATE = 0.3;
+        double MUTATION_RATE = 0.2;
         int POPULATION_SIZE = 500;
         double ELITISM = 0.5;
         int SIZE = 5;
